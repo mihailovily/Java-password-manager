@@ -1,3 +1,5 @@
+package mihailovily.passwords;
+
 import javax.crypto.SecretKey;
 import javax.swing.*;
 import java.awt.*;
