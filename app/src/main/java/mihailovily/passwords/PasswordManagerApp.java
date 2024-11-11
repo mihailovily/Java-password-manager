@@ -1,22 +1,15 @@
 package mihailovily.passwords;
 
-import javax.crypto.SecretKey;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
-import java.util.Random;
 
 public class PasswordManagerApp extends JFrame {
     private final JTextField loginField;
     private final JPasswordField passwordField;
     private final JComboBox<String> encryptionComboBox;
-    private JTextArea resultTextArea;
-    private SecretKey secretKey;
 
     public PasswordManagerApp() {
         setTitle("Менеджер паролей");
@@ -46,44 +39,44 @@ public class PasswordManagerApp extends JFrame {
         add(middlePanel, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
 
-        loginButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String login = loginField.getText();
-                String password = new String(passwordField.getPassword());
-                String encryptionMethod = (String) encryptionComboBox.getSelectedItem();
+        loginButton.addActionListener(e -> {
+            String login = loginField.getText();
+            String password = new String(passwordField.getPassword());
+            String encryptionMethod = (String) encryptionComboBox.getSelectedItem();
 
-                if (login.isEmpty() || password.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Please enter both login and password.");
-                    return;
-                }
+            if (login.isEmpty() || password.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Please enter both login and password.");
+                return;
+            }
 
-                try {
-                    switch (encryptionMethod) {
-                        case "Base64":
-                            login = encryptBase64(login);
-                            password = encryptBase64(password);
-                            break;
-                        case "MD5":
-                            login = encryptMD5(login);
-                            password = encryptMD5(password);
-                            break;
-                        case "Фейстель":
-                            login = encryptFeistel(login);
-                            password = encryptFeistel(password);
-                            break;
-                        case "B64 с солью":
-                            String salted_login = getSHA256Hash(login);
-                            password = encryptWithSalt(password, salted_login);
-                            break;
-                    }
-                    PasswordGeneratorMenu dialog = new PasswordGeneratorMenu(login, password);
-                    dialog.pack();
-                    dialog.setVisible(true);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(null, "Ошибка");
+            try {
+                switch (encryptionMethod) {
+                    case "Base64":
+                        login = encryptBase64(login);
+                        password = encryptBase64(password);
+                        break;
+                    case "MD5":
+                        login = encryptMD5(login);
+                        password = encryptMD5(password);
+                        break;
+                    case "Фейстель":
+                        login = encryptFeistel(login);
+                        password = encryptFeistel(password);
+                        break;
+                    case "B64 с солью":
+                        String salted_login = getSHA256Hash(login);
+                        password = encryptWithSalt(password, salted_login);
+                        break;
+                    case null:
+                        break;
+                    default:
+                        throw new IllegalStateException("Unexpected value: " + encryptionMethod);
                 }
+                PasswordGeneratorMenu dialog = new PasswordGeneratorMenu(login, password);
+                dialog.pack();
+                dialog.setVisible(true);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, "Ошибка");
             }
         });
     }
@@ -119,11 +112,10 @@ public class PasswordManagerApp extends JFrame {
         System.arraycopy(input, 0, left, 0, half);
         System.arraycopy(input, half, right, 0, half);
 
-        byte[] temp = new byte[half];
+        byte[] temp;
         for (int i = 0; i < 10; i++) {
             temp = feistelRound(left, right);
             left = temp;
-            temp = left;
         }
         byte[] result = new byte[n];
         System.arraycopy(left, 0, result, 0, half);
