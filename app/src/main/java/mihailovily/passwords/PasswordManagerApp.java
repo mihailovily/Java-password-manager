@@ -58,23 +58,26 @@ public class PasswordManagerApp extends JFrame {
                     return;
                 }
 
-                String result = "";
                 try {
                     switch (encryptionMethod) {
                         case "Base64":
-                            result = encryptBase64(password);
+                            login = encryptBase64(login);
+                            password = encryptBase64(password);
                             break;
                         case "MD5":
-                            result = encryptMD5(password);
+                            login = encryptMD5(login);
+                            password = encryptMD5(password);
                             break;
                         case "Фейстель":
-                            result = encryptFeistel(password);
+                            login = encryptFeistel(login);
+                            password = encryptFeistel(password);
                             break;
                         case "B64 с солью":
-                            result = encryptWithSalt(password);
+                            String salted_login = getSHA256Hash(login);
+                            password = encryptWithSalt(password, salted_login);
                             break;
                     }
-                    PasswordGeneratorMenu dialog = new PasswordGeneratorMenu(login, result);
+                    PasswordGeneratorMenu dialog = new PasswordGeneratorMenu(login, password);
                     dialog.pack();
                     dialog.setVisible(true);
                 } catch (Exception ex) {
@@ -103,8 +106,7 @@ public class PasswordManagerApp extends JFrame {
         return feistelCipher(password.getBytes());
     }
 
-    private String encryptWithSalt(String password) {
-        String salt = generateSalt();
+    private String encryptWithSalt(String password, String salt) {
         String saltedPassword = password + salt;
         return Base64.getEncoder().encodeToString(saltedPassword.getBytes());
     }
@@ -138,17 +140,20 @@ public class PasswordManagerApp extends JFrame {
         return result;
     }
 
-    private String generateSalt() {
-        Random rand = new Random();
-        byte[] salt = new byte[16];
-        rand.nextBytes(salt);
-        return Base64.getEncoder().encodeToString(salt);
-    }
-
-
-    public byte[] sha256Hash(String input) throws NoSuchAlgorithmException {
+    public static String getSHA256Hash(String input) throws NoSuchAlgorithmException {
+        // Получаем объект MessageDigest для алгоритма SHA-256
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        return digest.digest(input.getBytes(StandardCharsets.UTF_8));
+
+        // Преобразуем строку в массив байтов и вычисляем хэш
+        byte[] hashBytes = digest.digest(input.getBytes());
+
+        // Преобразуем байты хэша в строку в шестнадцатеричном формате
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : hashBytes) {
+            hexString.append(String.format("%02x", b));
+        }
+
+        return hexString.toString();
     }
 
     public static void main(String[] args) {

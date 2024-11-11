@@ -56,6 +56,7 @@ public class PasswordGeneratorMenu extends JDialog {
 
     private void getPass(String login, String salt) throws NoSuchAlgorithmException {
         String clientpassword = login + siteField.getText() + salt;
+        System.out.println(getSHA256Hash(clientpassword));
         clientpassword = encryptMD5(clientpassword);
         result.setText(clientpassword);
 
@@ -88,6 +89,22 @@ public class PasswordGeneratorMenu extends JDialog {
             }
             hexString.append(hex);
         }
+        return hexString.toString();
+    }
+
+    public static String getSHA256Hash(String input) throws NoSuchAlgorithmException {
+        // Получаем объект MessageDigest для алгоритма SHA-256
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+
+        // Преобразуем строку в массив байтов и вычисляем хэш
+        byte[] hashBytes = digest.digest(input.getBytes());
+
+        // Преобразуем байты хэша в строку в шестнадцатеричном формате
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : hashBytes) {
+            hexString.append(String.format("%02x", b));
+        }
+
         return hexString.toString();
     }
 }
