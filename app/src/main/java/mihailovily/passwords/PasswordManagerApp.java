@@ -6,12 +6,15 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.awt.GridLayout;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 public class PasswordManagerApp extends JFrame {
     // Объявим переменные для GUI
     private final JTextField loginField;
     private final JPasswordField passwordField;
     private final JComboBox<String> encryptionComboBox;
+    private static final Logger logger = LogManager.getLogger(PasswordManagerApp.class);
 
     // init GUI
     public PasswordManagerApp() {
@@ -19,22 +22,27 @@ public class PasswordManagerApp extends JFrame {
         setSize(400, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
+
         loginField = new JTextField();
         passwordField = new JPasswordField();
         JCheckBox checkboxUseRandomPassword = new JCheckBox("Генерация со случайными параметрами");
         JButton loginButton = new JButton("Войти");
         encryptionComboBox = new JComboBox<>(new String[]{"Base64", "MD5", "Фейстель", "B64 с солью"});
+
         JPanel topPanel = new JPanel(new GridLayout(2, 2));
         topPanel.add(new JLabel("Логин:"));
         topPanel.add(loginField);
         topPanel.add(new JLabel("Пароль:"));
         topPanel.add(passwordField);
+
         JPanel middlePanel = new JPanel();
         middlePanel.add(new JLabel("Метод шифрования:"));
         middlePanel.add(encryptionComboBox);
+
         JPanel bottomPanel = new JPanel();
         bottomPanel.add(loginButton);
         middlePanel.add(checkboxUseRandomPassword);
+
         add(topPanel, BorderLayout.NORTH);
         add(middlePanel, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
@@ -47,56 +55,63 @@ public class PasswordManagerApp extends JFrame {
 
             // Ловим пустые поля
             if (login.isEmpty() || password.isEmpty()) {
+                logger.warn("Поля логина и пароля не должны быть пустыми.");
                 JOptionPane.showMessageDialog(null, "Оба поля должны быть заполнены");
                 return;
             }
 
-            // Выбираем шифрование кредов и ловим ошибки
+            // Выбираем шифрование и ловим ошибки
             try {
                 switch (encryptionMethod) {
                     case "Base64":
                         login = encryptBase64(login);
                         password = encryptBase64(password);
+                        logger.info("Выбрано шифрование с использованием Base64.");
                         break;
                     case "MD5":
                         login = encryptMD5(login);
                         password = encryptMD5(password);
+                        logger.info("Выбрано шифрование с использованием MD5.");
                         break;
                     case "Фейстель":
                         login = encryptFeistel(login);
                         password = encryptFeistel(password);
+                        logger.info("Выбрано шифрование с использованием шифра Фейстеля.");
                         break;
                     case "B64 с солью":
-                        String salted_login = getSHA256Hash(login);
-                        password = encryptWithSalt(password, salted_login);
+                        String saltedLogin = getSHA256Hash(login);
+                        password = encryptWithSalt(password, saltedLogin);
+                        logger.info("Выбрано шифрование с использованием Base64 с солью.");
                         break;
                     case null:
                         break;
                     default:
-                        throw new IllegalStateException("Возникла ошибка: " + encryptionMethod);
+                        logger.warn("Выбран неверный метод шифрования: {}", encryptionMethod);
+                        throw new IllegalStateException("Неверный метод шифрования: " + encryptionMethod);
                 }
-                // Открываем следующее окошко, которое будет генерировать пароля для конкретного сайта, суем в него шифрованные креды
+                // Открываем следующее окно с генерацией паролей
                 PasswordGeneratorMenu dialog = new PasswordGeneratorMenu(login, password, checkboxUseRandomPassword.isSelected());
                 dialog.pack();
                 dialog.setVisible(true);
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, "Ошибка");
+                logger.error("Произошла ошибка при обработке пароля: ", ex);
+                JOptionPane.showMessageDialog(null, "Ошибка при обработке пароля");
             }
         });
     }
 
     // Дальше идут функции шифрования. Подаем строку, получаем ту же строку, но после шифрования
 
-    private String encryptBase64(String password)  { // Base64
+    private String encryptBase64(String password) {
         return Base64.getEncoder().encodeToString(password.getBytes());
     }
 
-    private String encryptWithSalt(String password, String salt) { // Base64 с солью
+    private String encryptWithSalt(String password, String salt) {
         String saltedPassword = password + salt;
         return Base64.getEncoder().encodeToString(saltedPassword.getBytes());
     }
 
-    private String encryptMD5(String password) throws NoSuchAlgorithmException { // MD5
+    private String encryptMD5(String password) throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("MD5");
         byte[] hash = md.digest(password.getBytes());
         StringBuilder hexString = new StringBuilder();
@@ -106,7 +121,7 @@ public class PasswordManagerApp extends JFrame {
         return hexString.toString();
     }
 
-    private String encryptFeistel(String password) { // Фейстель
+    private String encryptFeistel(String password) {
         return feistelCipher(password.getBytes());
     }
 
@@ -136,7 +151,7 @@ public class PasswordManagerApp extends JFrame {
         return result;
     }
 
-    public static String getSHA256Hash(String input) throws NoSuchAlgorithmException { // SHA256
+    public static String getSHA256Hash(String input) throws NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         byte[] hashBytes = digest.digest(input.getBytes());
         StringBuilder hexString = new StringBuilder();
@@ -148,6 +163,7 @@ public class PasswordManagerApp extends JFrame {
 
     public static void main(String[] args) {
         PasswordManagerApp app = new PasswordManagerApp();
+        logger.info("Приложение запущено.");
         app.setVisible(true);
     }
 }

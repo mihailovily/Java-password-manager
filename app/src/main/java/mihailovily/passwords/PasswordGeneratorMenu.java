@@ -1,5 +1,8 @@
 package mihailovily.passwords;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
@@ -11,6 +14,7 @@ import java.util.Random;
 public class PasswordGeneratorMenu extends JDialog {
     private final JTextField siteField = new JTextField("", 20);
     private final JTextField result = new JTextField("", 20);
+    private static final Logger logger = LogManager.getLogger(PasswordGeneratorMenu.class);
 
     public PasswordGeneratorMenu(String saltedLogin, String saltedPassword, boolean useRandomPassword) {
         // init GUI
@@ -32,24 +36,22 @@ public class PasswordGeneratorMenu extends JDialog {
         add(middlePanel, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
 
-        if (useRandomPassword) {
-            System.out.println(generateRandomSalt(10));
-        }
-
         // Оживляем кнопку
         buttonGet.addActionListener(e -> { // при нажатии кнопки генерируем пароль на основе домена и кредов пользователя
             try {
                 if (useRandomPassword) {
                     result.setText(genPass(saltedLogin + generateRandomSalt(10), saltedPassword)); // при нажатии кнопки генерируем пароль на основе домена и кредов пользователя
+                    logger.info("Сгенерирован пароль со случайной солью");
                 }
                 else {
                     result.setText(genPass(saltedLogin, saltedPassword));
+                    logger.info("Сгенерирован пароль на основе ранее введенных данных");
                 }
                 } catch (NoSuchAlgorithmException ex) {
+                logger.error("Произошла ошибка");
                 throw new RuntimeException(ex);
             }
         });
-
         // Прервать процесс при закрытии окна
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
@@ -65,6 +67,8 @@ public class PasswordGeneratorMenu extends JDialog {
         return PasswordManagerApp.getSHA256Hash(login + siteField.getText() + password);
     }
 
+
+    // функция для генерации соли
     public String generateRandomSalt(int targetLength) {
         int leftLimit = 97; // от 'a'
         int rightLimit = 122; // до 'z'
