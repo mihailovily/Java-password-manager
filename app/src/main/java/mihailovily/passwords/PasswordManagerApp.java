@@ -9,6 +9,9 @@ import java.awt.GridLayout;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
+/**
+ * GUI-реализация начального окна приложения менеджера паролей
+ */
 public class PasswordManagerApp extends JFrame {
     // Объявим переменные для GUI
     private final JTextField loginField;
@@ -102,15 +105,32 @@ public class PasswordManagerApp extends JFrame {
 
     // Дальше идут функции шифрования. Подаем строку, получаем ту же строку, но после шифрования
 
+    /**
+     * Принимает на вход пароль, шифрует в base64 и в виде String возвращает
+     * @param password Исходный пароль
+     * @return password, шифрованный в base64
+     */
     private String encryptBase64(String password) {
         return Base64.getEncoder().encodeToString(password.getBytes());
     }
 
+    /**
+     * Принимает на вход пароль и соль, шифрует пароль в base64 с солью и в виде String возвращает
+     * @param password исходный пароль
+     * @param salt соль для шифрования пароля
+     * @return password, шифрованный в base64 с солью salt
+     */
     private String encryptWithSalt(String password, String salt) {
         String saltedPassword = password + salt;
         return Base64.getEncoder().encodeToString(saltedPassword.getBytes());
     }
 
+    /**
+     * Принимает на вход пароль, хэширует пароль в mad5 и в виде String возвращает
+     * @param password исходный пароль
+     * @return password, хэшированный md5
+     * @throws NoSuchAlgorithmException если что-то пошло не так
+     */
     private String encryptMD5(String password) throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("MD5");
         byte[] hash = md.digest(password.getBytes());
@@ -121,6 +141,11 @@ public class PasswordManagerApp extends JFrame {
         return hexString.toString();
     }
 
+    /**
+     * Принимает на вход пароль, шифрует с использованием шифра Фейстеля и в виде String возвращает
+     * @param password исходный пароль
+     * @return password, шифрованный Фейстелем
+     */
     private String encryptFeistel(String password) {
         return feistelCipher(password.getBytes());
     }
@@ -151,6 +176,12 @@ public class PasswordManagerApp extends JFrame {
         return result;
     }
 
+    /**
+     *
+     * @param input исходный пароль
+     * @return пароль, хэшированный sha256
+     * @throws NoSuchAlgorithmException обработка ошибок
+     */
     public static String getSHA256Hash(String input) throws NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         byte[] hashBytes = digest.digest(input.getBytes());
