@@ -10,12 +10,20 @@ import java.awt.event.WindowEvent;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 
-
+/**
+ * GUI окошко генератора пароля, реализовано на основе JDialog
+ */
 public class PasswordGeneratorMenu extends JDialog {
     private final JTextField siteField = new JTextField("", 20);
     private final JTextField result = new JTextField("", 20);
     private static final Logger logger = LogManager.getLogger(PasswordGeneratorMenu.class);
 
+    /**
+     *
+     * @param saltedLogin логин, использованный пользователем для входа в приложение
+     * @param saltedPassword пароль, использованный пользователем для входа в приложение
+     * @param useRandomPassword необходимость добавлять случайную соль, задается в виде Boolean
+     */
     public PasswordGeneratorMenu(String saltedLogin, String saltedPassword, boolean useRandomPassword) {
         // init GUI
         JPanel contentPanel = new JPanel();
@@ -62,13 +70,23 @@ public class PasswordGeneratorMenu extends JDialog {
 
     }
 
-
+    /**
+     *
+     * @param login шифрованный логин, использованный для входа в менеджер
+     * @param password шифрованный пароль, использованный для входа в менеджер
+     * @return пароль для запрошенного сайта
+     * @throws NoSuchAlgorithmException если не нашлось sha256
+     */
     private String genPass(String login, String password) throws NoSuchAlgorithmException {
         return PasswordManagerApp.getSHA256Hash(login + siteField.getText() + password);
     }
 
 
-    // функция для генерации соли
+    /**
+     *
+     * @param targetLength длина соли
+     * @return случайную соль заданной длины
+     */
     public String generateRandomSalt(int targetLength) {
         int leftLimit = 97; // от 'a'
         int rightLimit = 122; // до 'z'
@@ -82,6 +100,10 @@ public class PasswordGeneratorMenu extends JDialog {
         return buffer.toString();
     }
 
+    /**
+     *
+     * @param args логин, пароль и использование доп соли
+     */
     public static void main(String[] args) {
         PasswordGeneratorMenu dialog = new PasswordGeneratorMenu(args[0], args[1], Boolean.parseBoolean(args[2]));
         dialog.setSize(300, 300);
