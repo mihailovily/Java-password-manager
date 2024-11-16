@@ -19,7 +19,9 @@ public class PasswordManagerApp extends JFrame {
     private final JComboBox<String> encryptionComboBox;
     private static final Logger logger = LogManager.getLogger(PasswordManagerApp.class);
 
-    // init GUI
+    /**
+     * Инициализация и запуск приложения-экземпляра менеджера паролей
+     */
     public PasswordManagerApp() {
         setTitle("Менеджер паролей");
         setSize(400, 400);
