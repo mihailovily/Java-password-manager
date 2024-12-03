@@ -42,10 +42,12 @@ application {
 }
 
 
-jar {
+task fatJar(type: Jar) {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     manifest {
-        attributes(
-                'Main-Class': 'mihailovily.passwords.App'
-        )
+        attributes 'Main-Class': "mihailovily.passwords.App"
     }
+    archiveBaseName = "${rootProject.name}"
+    from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
 }
