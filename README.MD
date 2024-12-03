@@ -1,27 +1,21 @@
-GRADLE
+# Java password manager by mihailovily
 
-https://javarush.com/groups/posts/2126-kratkoe-znakomstvo-s-gradle
-https://habr.com/ru/companies/itq_group/articles/711712/
-https://stackoverflow.com/questions/4871656/using-gradle-to-build-a-jar-with-dependencies
+## Инфо о проекте
 
+Проект представляет собой реализацию менеджера паролей на java, разработанного в рамках курсовой работы за 3 семестр
 
+## Структура
 
-LOG4J
-https://mkyong.com/logging/log4j-hello-world-example/
+[Javadoc](https://github.com/mihailovily/Java-password-manager/tree/main/app/docs/javadoc): /app/docs/javadoc/
 
+[Отчет](https://github.com/mihailovily/Java-password-manager/blob/main/app/docs/%D0%9E%D1%82%D1%87%D0%B5%D1%82.docx): /app/docs/Отчет.docx
 
-SWING
-https://www.geeksforgeeks.org/java-swing-jtextfield/
-https://docs.oracle.com/javase/tutorial/uiswing/layout/grid.html
-https://www.jetbrains.com/help/idea/design-gui-using-swing.html#add-functionality-to-the-form
-https://www.geeksforgeeks.org/java-swing-create-a-simple-text-editor/
-https://pro-prof.com/forums/topic/java-swing-%D0%BE%D1%81%D0%BD%D0%BE%D0%B2%D1%8B
-https://www.formdev.com/jformdesigner/installation/#install_intellij_idea
+[Сурсы](https://github.com/mihailovily/Java-password-manager/tree/main/app/src/main/java/mihailovily/passwords): /app/src/main/java/mihailovily/passwords
 
+## Как это запустить?
 
-Cryptography
-https://sky.pro/wiki/java/kheshirovanie-stroki-s-pomoschyu-sha-256-v-java-rukovodstvo/
-https://www.baeldung.com/java-md5
-https://www.baeldung.com/sha-256-hashing-java
-https://stackoverflow.com/questions/40331050/small-implementation-of-a-feistel-cipher-in-java
-https://www.baeldung.com/java-base64-encode-and-decode
+Скачать собранную версию и запустить через java -jar или в папке с проектом ввести gradle run
+
+## Собранная версия
+
+Можно найти в [releases](https://github.com/mihailovily/Java-password-manager/releases) или по пути /app/build/libs/Java-password-manager.jar
