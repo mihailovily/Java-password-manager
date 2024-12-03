@@ -6,3 +6,5 @@
 [INFO] 2024-11-16 10:01:36.422 [AWT-EventQueue-0] PasswordManagerApp - Выбрано шифрование с использованием Base64.
 [INFO] 2024-11-16 10:01:41.702 [AWT-EventQueue-0] PasswordGeneratorMenu - Окно генератора паролей запущено
 [INFO] 2024-11-16 10:04:34.334 [main] PasswordManagerApp - Приложение запущено.
+[INFO] 2024-12-03 14:07:38.405 [main] PasswordManagerApp - Приложение запущено.
+[INFO] 2024-12-03 14:07:44.760 [AWT-EventQueue-0] PasswordManagerApp - Выбрано шифрование с использованием Base64.
